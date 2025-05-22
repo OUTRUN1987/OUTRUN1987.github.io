@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://api-maps.yandex.ru/2.1/?lang=en_RU" type="text/javascript"></script>
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <title>Карта и График Высот</title>
   <style>
     * {
@@ -142,11 +142,9 @@
       for (let i = 0; i < sampled.length; i += 50) {
         const batch = sampled.slice(i, i + 50);
         const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
-        const apiUrl = `https://api.opentopodata.org/v1/srtm90m?locations=${query}`;
+        const apiUrl = `https://corsproxy.io/?https://api.opentopodata.org/v1/srtm90m?locations=${query}`;
 
-        const proxyUrl = `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(apiUrl)}`;
-
-        const res = await fetch(proxyUrl);
+        const res = await fetch(apiUrl);
         const data = await res.json();
 
         if (data.results) {
