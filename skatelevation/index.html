@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Карта и График Высот</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    @media (orientation: landscape) {
+      .container {
+        flex-direction: row;
+      }
+    }
+
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    .panel-content {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.2rem;
+      text-align: center;
+      color: #555;
+    }
+
+    #map {
+      flex: 1;
+      border-radius: 8px;
+    }
+
+    #elevationChart {
+      flex: 1;
+      max-height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="panel">
+      <div class="panel-content">
+        <h2>Маршрут на карте</h2>
+        <div id="map"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-content">
+        <h2>График высот</h2>
+        <canvas id="elevationChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let map, polyline, elevationChart;
+    const referencePoints = [];
+
+    ymaps.ready(init);
+
+    function init() {
+      map = new ymaps.Map("map", {
+        center: [55.751244, 37.618423],
+        zoom: 10
+      });
+
+      polyline = new ymaps.Polyline([], {}, {
+        strokeColor: '#0000FF',
+        strokeWidth: 4
+      });
+      map.geoObjects.add(polyline);
+
+      map.events.add('click', async function (e) {
+        const coords = e.get('coords');
+        referencePoints.push(coords);
+        polyline.geometry.setCoordinates(referencePoints);
+
+        if (referencePoints.length > 1) {
+          const allCoords = interpolateCoords(referencePoints, 0.001);
+          const elevations = await getElevationsViaProxy(allCoords);
+          drawElevationChart(elevations);
+        }
+      });
+    }
+
+    function interpolateCoords(points, stepDegrees) {
+      const result = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        const [lat1, lon1] = points[i];
+        const [lat2, lon2] = points[i + 1];
+
+        const dLat = lat2 - lat1;
+        const dLon = lon2 - lon1;
+        const steps = Math.max(Math.abs(dLat), Math.abs(dLon)) / stepDegrees;
+
+        for (let j = 0; j <= steps; j++) {
+          const lat = lat1 + (dLat * j / steps);
+          const lon = lon1 + (dLon * j / steps);
+          result.push([lat, lon]);
+        }
+      }
+      return result;
+    }
+
+    async function getElevationsViaProxy(coords) {
+      const sampled = coords.filter((_, i) => i % 10 === 0);
+      const results = [];
+
+      for (let i = 0; i < sampled.length; i += 50) {
+        const batch = sampled.slice(i, i + 50);
+        const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
+        const apiUrl = `https://api.opentopodata.org/v1/srtm90m?locations=${query}`;
+
+        const proxyUrl = `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(apiUrl)}`;
+
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+
+        if (data.results) {
+          results.push(...data.results.map(r => r.elevation));
+        }
+      }
+
+      return results;
+    }
+
+    function drawElevationChart(elevations) {
+      const ctx = document.getElementById('elevation').getContext('2d');
+      if (elevationChart) elevationChart.destroy();
+      elevationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: elevations.map((_, i) => i),
+          datasets: [{
+            label: 'Elevation (m)',
+            data: elevations,
+            fill: true,
+            borderColor: 'blue',
+            backgroundColor: 'rgba(173, 216, 230, 0.5)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          scales: {
+            x: { display: false },
+            y: { beginAtZero: false }
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
