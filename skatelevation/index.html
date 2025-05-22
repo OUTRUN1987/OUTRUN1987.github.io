@@ -76,34 +76,38 @@
   <script>
     let map, polyline;
     const referencePoints = [];
-
+    
     ymaps.ready(init);
-
+    
     function init() {
       map = new ymaps.Map("map", {
         center: [55.751244, 37.618423],
         zoom: 10
       });
-
+    
       polyline = new ymaps.Polyline([], {}, {
         strokeColor: '#0000FF',
         strokeWidth: 4
       });
       map.geoObjects.add(polyline);
-
+    
       map.events.add('click', async function (e) {
         const coords = e.get('coords');
         referencePoints.push(coords);
         polyline.geometry.setCoordinates(referencePoints);
-
+    
         if (referencePoints.length > 1) {
-          const allCoords = interpolateCoords(referencePoints, 0.0001);
-          const { elevations, distances } = await getElevationsViaProxy(allCoords);
-          drawElevationChart(elevations, distances);
+          updateElevationProfile();
         }
       });
     }
-
+    
+    async function updateElevationProfile() {
+      const allCoords = interpolateCoords(referencePoints, 0.0001);
+      const { elevations, distances } = await getElevationsViaProxy(allCoords);
+      drawElevationChart(elevations, distances);
+    }
+    
     function interpolateCoords(points, stepDegrees) {
       const result = [];
       for (let i = 0; i < points.length - 1; i++) {
@@ -112,7 +116,7 @@
         const dLat = lat2 - lat1;
         const dLon = lon2 - lon1;
         const steps = Math.max(Math.abs(dLat), Math.abs(dLon)) / stepDegrees;
-
+    
         for (let j = 0; j <= steps; j++) {
           const lat = lat1 + (dLat * j / steps);
           const lon = lon1 + (dLon * j / steps);
@@ -121,7 +125,7 @@
       }
       return result;
     }
-
+    
     function haversineDistance(coord1, coord2) {
       const R = 6371e3;
       const toRad = deg => deg * Math.PI / 180;
@@ -129,13 +133,13 @@
       const [lat2, lon2] = coord2.map(toRad);
       const dLat = lat2 - lat1;
       const dLon = lon2 - lon1;
-
+    
       const a = Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+                Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
-
+    
     function calculateCumulativeDistances(coords) {
       const distances = [0];
       let total = 0;
@@ -145,31 +149,30 @@
       }
       return distances;
     }
-
+    
     async function getElevationsViaProxy(coords) {
       const sampled = coords.filter((_, i) => i % 10 === 0);
       const results = [];
-
+    
       for (let i = 0; i < sampled.length; i += 50) {
         const batch = sampled.slice(i, i + 50);
         const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
-
+    
         const res = await fetch('https://outrun1987-cors.artemdubrov2007.workers.dev/?url=' +
           `https://api.opentopodata.org/v1/srtm90m?locations=${query}`);
-        
+    
         const data = await res.json();
-        console.log(data);
         if (data.results) {
           results.push(...data.results.map(r => r.elevation));
         }
       }
-
+    
       return {
         elevations: results,
         distances: calculateCumulativeDistances(sampled)
       };
     }
-
+    
     function drawElevationChart(elevations, distances) {
       Plotly.newPlot('chart', [{
         x: distances,
@@ -185,7 +188,7 @@
         responsive: true
       });
     }
-
+    
     window.addEventListener('resize', () => {
       Plotly.Plots.resize(document.getElementById('chart'));
       if (map && map.container) {
@@ -193,7 +196,8 @@
         setTimeout(() => map.container.fitToViewport(), 100);
       }
     });
-  </script>
+    </script>
+    
 </body>
 
 </html>
