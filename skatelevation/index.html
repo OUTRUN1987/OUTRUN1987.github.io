@@ -142,9 +142,19 @@
       for (let i = 0; i < sampled.length; i += 50) {
         const batch = sampled.slice(i, i + 50);
         const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
-        const apiUrl = `https://crossorigin.me/https://api.opentopodata.org/v1/srtm90m?locations=${query}`;
-
-        const res = await fetch(apiUrl);
+        const apiUrl = `https://crossorigin.me//srtm90m?locations=${query}`;
+        
+        const res = await fetch("https://api.opentopodata.org/v1/srtm90m", {
+            method: "POST",
+            body: JSON.stringify({
+                locations: query,
+                interpolation: "cubic"
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        });
+        // const res = await fetch(apiUrl);
         const data = await res.json();
 
         if (data.results) {
