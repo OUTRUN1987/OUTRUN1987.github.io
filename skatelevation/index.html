@@ -144,7 +144,7 @@
         const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
         const apiUrl = `https://crossorigin.me//srtm90m?locations=${query}`;
         
-        const res = fetch('http://https://outrun1987-cors.artemdubrov2007.workers.dev/?endpoint=' + 
+        const res = fetch('https://outrun1987-cors.artemdubrov2007.workers.dev/?endpoint=' + 
             encodeURIComponent('https://api.opentopodata.org/v1/srtm90m?locations=50,14'));
   
         // const res = await fetch(apiUrl);
