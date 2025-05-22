@@ -160,7 +160,7 @@
     }
 
     function drawElevationChart(elevations) {
-      const ctx = document.getElementById('elevation').getContext('2d');
+      const ctx = document.getElementById('elevationChart').getContext('2d');
       if (elevationChart) elevationChart.destroy();
       elevationChart = new Chart(ctx, {
         type: 'line',
@@ -177,8 +177,8 @@
         },
         options: {
           scales: {
-            x: { display: false },
-            y: { beginAtZero: false }
+            x: { display: true },
+            y: { beginAtZero: true }
           }
         }
       });
