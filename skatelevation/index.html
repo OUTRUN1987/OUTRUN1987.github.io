@@ -144,18 +144,11 @@
         const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
         const apiUrl = `https://crossorigin.me//srtm90m?locations=${query}`;
         
-        const res = await fetch("https://api.opentopodata.org/v1/srtm90m", {
-            method: "POST",
-            body: JSON.stringify({
-                locations: query,
-                interpolation: "cubic"
-            }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        });
+        const res = fetch('http://https://outrun1987-cors.artemdubrov2007.workers.dev/?endpoint=' + 
+            encodeURIComponent('https://api.opentopodata.org/v1/srtm90m?locations=50,14'));
+  
         // const res = await fetch(apiUrl);
-        const data = await res.json();
+        const data = await res.json().then(data => console.log(data));
 
         if (data.results) {
           results.push(...data.results.map(r => r.elevation));
