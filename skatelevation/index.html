@@ -148,7 +148,7 @@
             encodeURIComponent('https://api.opentopodata.org/v1/srtm90m?locations=50,14'));
   
         // const res = await fetch(apiUrl);
-        const data = await res.json().then(data => console.log(data));
+        const data = await res.json();
 
         if (data.results) {
           results.push(...data.results.map(r => r.elevation));
