@@ -2,221 +2,197 @@
 <html lang="ru">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+  <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
 
-    <title>Карта и График Высот</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <title>Карта и График Высот</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-        }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+    }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
+    .panel {
+      width: 100%;
+      padding: 1rem;
+    }
 
-        @media (orientation: landscape) {
-            .container {
-                flex-direction: row;
-            }
-        }
+    .panel-content {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
 
-        .panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-        }
+    h2 {
+      margin: 0 0 1rem 0;
+      font-size: 2rem;
+      text-align: center;
+      color: #555;
+    }
 
-        .panel-content {
-            flex: 1;
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    #map {
+      width: 100%;
+      height: 400px;
+      border-radius: 8px;
+      min-height: 1000px;
+    }
 
-        h2 {
-            margin: 0 0 1rem 0;
-            font-size: 1.2rem;
-            text-align: center;
-            color: #555;
-        }
-
-        #map {
-            flex: 1;
-            border-radius: 8px;
-        }
-
-        #chart {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            min-height: 300px;
-            /* or some fixed value */
-        }
-    </style>
+    #chart {
+      width: 100%;
+      min-height: 500px;
+    }
+  </style>
 </head>
 
 <body>
-
-    <div class="container">
-        <div class="panel">
-            <div class="panel-content">
-                <h2>Маршрут на карте</h2>
-                <div id="map"></div>
-            </div>
-        </div>
-        <div class="panel">
-            <div class="panel-content">
-                <h2>График высот</h2>
-                <div id="chart"></div>
-            </div>
-        </div>
+  <div class="panel" id="map-panel">
+    <div class="panel-content">
+      <h2>Маршрут на карте</h2>
+      <div id="map"></div>
     </div>
+  </div>
 
-    <script>
-        let map, polyline, elevationChart;
-        const referencePoints = [];
+  <div class="panel" id="chart-panel">
+    <div class="panel-content">
+      <h2>График высот</h2>
+      <div id="chart"></div>
+    </div>
+  </div>
 
-        ymaps.ready(init);
+  <script>
+    let map, polyline;
+    const referencePoints = [];
 
-        function init() {
-            map = new ymaps.Map("map", {
-                center: [55.751244, 37.618423],
-                zoom: 10
-            });
+    ymaps.ready(init);
 
-            polyline = new ymaps.Polyline([], {}, {
-                strokeColor: '#0000FF',
-                strokeWidth: 4
-            });
-            map.geoObjects.add(polyline);
+    function init() {
+      map = new ymaps.Map("map", {
+        center: [55.751244, 37.618423],
+        zoom: 10
+      });
 
-            map.events.add('click', async function (e) {
-                const coords = e.get('coords');
-                referencePoints.push(coords);
-                polyline.geometry.setCoordinates(referencePoints);
+      polyline = new ymaps.Polyline([], {}, {
+        strokeColor: '#0000FF',
+        strokeWidth: 4
+      });
+      map.geoObjects.add(polyline);
 
-                if (referencePoints.length > 1) {
-                    const allCoords = interpolateCoords(referencePoints, 0.0001);
-                    const { elevations, distances } = await getElevationsViaProxy(allCoords);
-                    drawElevationChart(elevations, distances);
-                }
-            });
+      map.events.add('click', async function (e) {
+        const coords = e.get('coords');
+        referencePoints.push(coords);
+        polyline.geometry.setCoordinates(referencePoints);
+
+        if (referencePoints.length > 1) {
+          const allCoords = interpolateCoords(referencePoints, 0.0001);
+          const { elevations, distances } = await getElevationsViaProxy(allCoords);
+          drawElevationChart(elevations, distances);
         }
+      });
+    }
 
-        function interpolateCoords(points, stepDegrees) {
-            const result = [];
-            for (let i = 0; i < points.length - 1; i++) {
-                const [lat1, lon1] = points[i];
-                const [lat2, lon2] = points[i + 1];
+    function interpolateCoords(points, stepDegrees) {
+      const result = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        const [lat1, lon1] = points[i];
+        const [lat2, lon2] = points[i + 1];
+        const dLat = lat2 - lat1;
+        const dLon = lon2 - lon1;
+        const steps = Math.max(Math.abs(dLat), Math.abs(dLon)) / stepDegrees;
 
-                const dLat = lat2 - lat1;
-                const dLon = lon2 - lon1;
-                const steps = Math.max(Math.abs(dLat), Math.abs(dLon)) / stepDegrees;
-
-                for (let j = 0; j <= steps; j++) {
-                    const lat = lat1 + (dLat * j / steps);
-                    const lon = lon1 + (dLon * j / steps);
-                    result.push([lat, lon]);
-                }
-            }
-            return result;
+        for (let j = 0; j <= steps; j++) {
+          const lat = lat1 + (dLat * j / steps);
+          const lon = lon1 + (dLon * j / steps);
+          result.push([lat, lon]);
         }
-        function haversineDistance(coord1, coord2) {
-            const R = 6371e3; // Earth's radius in meters
-            const toRad = deg => deg * Math.PI / 180;
+      }
+      return result;
+    }
 
-            const [lat1, lon1] = coord1.map(toRad);
-            const [lat2, lon2] = coord2.map(toRad);
-            const dLat = lat2 - lat1;
-            const dLon = lon2 - lon1;
+    function haversineDistance(coord1, coord2) {
+      const R = 6371e3;
+      const toRad = deg => deg * Math.PI / 180;
+      const [lat1, lon1] = coord1.map(toRad);
+      const [lat2, lon2] = coord2.map(toRad);
+      const dLat = lat2 - lat1;
+      const dLon = lon2 - lon1;
 
-            const a = Math.sin(dLat / 2) ** 2 +
-                Math.cos(lat1) * Math.cos(lat2) *
-                Math.sin(dLon / 2) ** 2;
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const a = Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
 
-            return R * c; // distance in meters
+    function calculateCumulativeDistances(coords) {
+      const distances = [0];
+      let total = 0;
+      for (let i = 1; i < coords.length; i++) {
+        total += haversineDistance(coords[i - 1], coords[i]);
+        distances.push(total / 1000);
+      }
+      return distances;
+    }
+
+    async function getElevationsViaProxy(coords) {
+      const sampled = coords.filter((_, i) => i % 10 === 0);
+      const results = [];
+
+      for (let i = 0; i < sampled.length; i += 50) {
+        const batch = sampled.slice(i, i + 50);
+        const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
+
+        const res = await fetch('https://outrun1987-cors.artemdubrov2007.workers.dev/?url=' +
+          `https://api.opentopodata.org/v1/srtm90m?locations=${query}`);
+
+        const data = await res.json();
+        if (data.results) {
+          results.push(...data.results.map(r => r.elevation));
         }
+      }
 
+      return {
+        elevations: results,
+        distances: calculateCumulativeDistances(sampled)
+      };
+    }
 
-        async function getElevationsViaProxy(coords) {
-            const sampled = coords.filter((_, i) => i % 10 === 0);
-            const results = [];
+    function drawElevationChart(elevations, distances) {
+      Plotly.newPlot('chart', [{
+        x: distances,
+        y: elevations,
+        type: 'scatter',
+        mode: 'lines+markers',
+        line: { color: 'blue', shape: "spline" },
+      }], {
+        title: 'Профиль высот',
+        xaxis: { title: { text: 'Дистанция (км)' } },
+        yaxis: { title: { text: 'Высота (м)' } }
+      }, {
+        responsive: true
+      });
+    }
 
-            for (let i = 0; i < sampled.length; i += 50) {
-                const batch = sampled.slice(i, i + 50);
-                const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
-
-                const res = await fetch('https://outrun1987-cors.artemdubrov2007.workers.dev/?url=' +
-                    `https://api.opentopodata.org/v1/srtm90m?locations=${query}`);
-                console.log(res);
-
-                const data = await res.json();
-                console.log(data);
-
-                if (data.results) {
-                    results.push(...data.results.map(r => r.elevation));
-                }
-            }
-
-            return {
-                elevations: results,
-                distances: calculateCumulativeDistances(sampled)
-            };
-        }
-        function calculateCumulativeDistances(coords) {
-            const distances = [0];
-            let total = 0;
-
-            for (let i = 1; i < coords.length; i++) {
-                const d = haversineDistance(coords[i - 1], coords[i]);
-                total += d;
-                distances.push(total / 1000); // convert to kilometers
-            }
-
-            return distances;
-        }
-
-        function drawElevationChart(elevations, distances) {
-            Plotly.newPlot('chart', [{
-                x: distances,
-                y: elevations,
-                type: 'scatter',
-                mode: 'lines+markers',
-                line: { color: 'blue', shape: "spline" },
-            }], {
-                title: 'Профиль высот',
-                xaxis: { title: {text: 'Дистанция (км)'} },
-                yaxis: { title: {text: 'Высота (м)'} },
-                scrollZoom: true
-            });
-        }
-
-
-
-    </script>
-
+    window.addEventListener('resize', () => {
+      Plotly.Plots.resize(document.getElementById('chart'));
+      if (map && map.container) {
+        map.container.fitToViewport();
+        setTimeout(() => map.container.fitToViewport(), 100);
+      }
+    });
+  </script>
 </body>
 
 </html>
