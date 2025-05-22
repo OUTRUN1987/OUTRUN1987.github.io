@@ -142,13 +142,10 @@
       for (let i = 0; i < sampled.length; i += 50) {
         const batch = sampled.slice(i, i + 50);
         const query = batch.map(c => `${c[0]},${c[1]}`).join("|");
-        const encodedUrl = encodeURIComponent(`https://api.opentopodata.org/v1/srtm90m?locations=${query}`);
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodedUrl}`;
+        const apiUrl = `https://corsproxy.io/?https://api.opentopodata.org/v1/srtm90m?locations=${query}`;
 
-        const res = await fetch(proxyUrl);
-        const json = await res.json();
-        const data = JSON.parse(json.contents);
-
+        const res = await fetch(apiUrl);
+        const data = await res.json();
 
         if (data.results) {
           results.push(...data.results.map(r => r.elevation));
