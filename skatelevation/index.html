@@ -145,7 +145,7 @@
         const apiUrl = `https://crossorigin.me//srtm90m?locations=${query}`;
         
         const res = await fetch('https://outrun1987-cors.artemdubrov2007.workers.dev/?endpoint=' + 
-            encodeURIComponent('https://api.opentopodata.org/v1/srtm90m?locations=50,14'));
+            'https://api.opentopodata.org/v1/srtm90m?locations=50,14');
         console.log(res);
         // const res = await fetch(apiUrl);
         const data = await res.json();
