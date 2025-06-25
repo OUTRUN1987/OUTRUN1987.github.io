@@ -1,0 +1,282 @@
+
+// COLORS
+// TRIXBIT palette
+$black: #0f0d0f
+$magenta: #d01f6c
+$dark-magenta: #732050
+$orange: #f79831
+$lime: #86bd28
+$green: #184a4a
+$dark-blue: #1e1a4f
+$blue: #2da1c4
+$purple: #7d4582
+$light-pink: #dca8c9
+$cream: #f7e0b2
+$pink: #e37f8f
+$white: #f7f1e4
+$light-grey: #b5a9a3
+$grey: #5f5666
+
+$space-xs: 0.25rem
+$space-sm: 0.5rem
+$space-md: 1rem
+$space-lg: 2rem
+$space-xl: 4rem
+$space-xxl: 6rem
+
+$font-size-xxs: 0.75rem
+$font-size-xs: 1rem
+$font-size-sm: 1.2rem
+$font-size-md: 1.44rem
+$font-size-lg: 1.728rem
+$font-size-xl: 2.074rem
+$font-size-xxl: 2.488rem
+$font-size-xxxl: 2.986rem
+
+:root
+    scroll-padding-top: $font-size-xxxl
+
+html
+    scroll-behavior: smooth
+
+.glow-on-hover
+    transition: text-shadow 0.3s ease
+
+.glow-on-hover:hover
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor
+
+@keyframes neonPulse
+    0%, 100%
+        text-shadow: 0 0 4px currentColor, 0 0 8px currentColor, 0 0 12px currentColor
+        opacity: 1
+
+    50%
+        text-shadow: 0 0 2px currentColor, 0 0 4px currentColor
+        opacity: 0.8
+
+@keyframes neonFlicker
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%
+        opacity: 1
+
+    20%, 22%, 24%, 55%
+        opacity: 0.4
+
+.glow-pulse
+    text-shadow: 0 0 4px currentColor, 0 0 8px currentColor, 0 0 12px currentColor
+    transition: color 0.3s ease
+    animation: neonPulse 2.5s ease-in-out infinite
+
+.glow
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor
+
+.light-glow
+    text-shadow: 0 0 8px currentColor
+
+.flicker
+    animation: neonFlicker 3.5s linear infinite
+
+body
+    background-color: $black
+    font-family: 'Orbitron'
+    font-weight: 400
+    color: $white
+    margin: 0
+    padding: 0
+
+.header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    padding: $space-md $space-lg
+
+    border-bottom: 1px solid $white
+    box-shadow: 0 0 $space-lg $white
+
+    .logo
+        font-size: $font-size-xxl
+        font-weight: 700
+        letter-spacing: $space-xs
+
+    .main-nav
+        display: flex
+        flex-direction: row
+        flex-wrap: wrap
+        align-items: center
+        align-content: center
+        justify-content: flex-end
+
+        .nav-link
+            padding: $space-sm
+            text-decoration: none
+            font-size: $font-size-md
+            margin: -$space-xs $space-xs
+
+        .nav-projects
+            color: $magenta
+
+        .nav-about
+            color: $orange
+
+        .nav-contact
+            color: $blue
+
+.hero
+    align-items: center
+    justify-content: center
+    text-align: center
+
+    .hero-image
+        width: 100%
+        height: 50vh
+        background-image: linear-gradient(to top, $black, rgba(0, 0, 0, 0) 25%), url('/media/hero-bg.jpg')
+        background-repeat: no-repeat
+        background-position: center
+        background-size: cover
+        filter: blur(12px) brightness(0.4) saturate(200%)
+        position: relative
+
+    .hero-text
+        position: absolute
+        text-align: center
+        letter-spacing: $space-xs
+        width: 100%
+        top: 40%
+        left: 50%
+        transform: translate(-50%, -50%)
+
+        .hero-title
+            color: $white
+            font-size: $font-size-xxxl
+            font-weight: 900
+            padding: 0
+            margin-bottom: $space-sm
+
+        .hero-subtitle
+            color: $blue
+            font-size: $font-size-md
+            padding: 0
+            margin: 0
+            text-shadow: 0 0 4px $black, 0 0 10px $black
+
+.section-title
+    font-size: $font-size-xxl
+    font-weight: 700
+    margin-bottom: $space-lg
+
+    transition: letter-spacing 0.5s ease-in-out
+
+    span
+        display: flex
+        flex: 1
+        width: 90%
+        margin: $space-md auto
+        line-height: 2px
+
+        &::before,
+        &::after
+            content: ''
+            flex-grow: 1
+            margin: 0px $space-xs
+            background-size: 100% 2px
+            background-position: 0% 50%
+            background-repeat: repeat-x
+
+        &::before
+            background: linear-gradient(to right, $black, currentColor)
+
+        &::after
+            background: linear-gradient(to right, currentColor, $black)
+
+section
+    &:hover .section-title
+        letter-spacing: $space-sm
+
+.sectionbreak
+    margin-top: $space-xxl
+
+.about
+    .section-title
+        color: $orange
+
+    p
+        text-align: center
+        font-size: $font-size-sm
+        width: 75%
+        padding-left: 12.5%
+        line-height: 1.5
+
+        .outrun
+            font-size: $font-size-md
+            color: $orange
+            letter-spacing: $space-sm
+
+.projects
+    .section-title
+        color: $magenta
+
+.contact
+    .section-title
+        color: $blue
+
+    form
+        width: 75%
+        padding-left: 12.5%
+        display: flex
+        flex-direction: column
+        align-items: center
+
+        label
+            font-size: $font-size-md
+            margin-bottom: $space-xs
+
+        input, textarea
+            letter-spacing: $space-xs
+            background: transparent
+            width: 75%
+            font-size: $font-size-sm
+            font-family: inherit
+            padding: $space-sm
+            color: $white
+            margin-bottom: $space-md
+
+            border: 1px solid $blue
+            border-radius: $space-sm
+
+            transition: box-shadow 0.5s, color 0.5s
+
+            &:hover
+                box-shadow: 0 0 4px $blue, 0 0 8px $blue, 0 0 16px $blue
+
+            &:focus
+                outline: none
+                box-shadow: 0 0 4px $orange, 0 0 8px $orange, 0 0 16px $orange
+                border: 1px solid $orange
+
+        textarea
+            resize: none
+
+        button
+            font-family: inherit
+            font-size: $font-size-md
+            padding: $space-sm $space-lg
+            margin-top: $space-md
+            background: transparent
+            border: 1px solid $blue
+            border-radius: $space-sm
+            font-weight: 400
+
+            transition: box-shadow 0.5s, color 0.5s, background 0.5s
+            color: $blue
+
+        button:hover
+            box-shadow: 0 0 4px $blue, 0 0 8px $blue, 0 0 16px $blue
+
+        button:focus
+            outline: none
+            box-shadow: 0 0 4px $orange, 0 0 8px $orange, 0 0 16px $orange
+            border: 1px solid $orange
+            color: $black
+            background: $orange
+
+footer
+    height: 100vh
