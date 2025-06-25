@@ -17,6 +17,10 @@ $white: #f7f1e4
 $light-grey: #b5a9a3
 $grey: #5f5666
 
+$breakpoint-sm: 480px
+$breakpoint-md: 768px
+$breakpoint-lg: 1024px
+
 $space-xs: 0.25rem
 $space-sm: 0.5rem
 $space-md: 1rem
@@ -33,11 +37,48 @@ $font-size-xl: 2.074rem
 $font-size-xxl: 2.488rem
 $font-size-xxxl: 2.986rem
 
+$breakpoint-sm: 480px
+$breakpoint-md: 768px
+$breakpoint-lg: 1024px
+
+=responsive-variables
+    @media (max-width: $breakpoint-lg)
+        $font-size-lg: 1.5rem
+        $font-size-xl: 1.8rem
+        $font-size-xxl: 2.2rem
+        $space-xl: 3rem
+        $space-xxl: 4rem
+
+    @media (max-width: $breakpoint-md)
+        $font-size-lg: 1.3rem
+        $font-size-xl: 1.6rem
+        $font-size-xxl: 2rem
+        $space-xl: 2rem
+        $space-xxl: 3rem
+
+    @media (max-width: $breakpoint-sm)
+        $font-size-lg: 1.1rem
+        $font-size-xl: 1.3rem
+        $font-size-xxl: 1.6rem
+        $space-xl: 1.5rem
+        $space-xxl: 2rem
+
 :root
     scroll-padding-top: $font-size-xxxl
 
 html
     scroll-behavior: smooth
+
+    @media (max-width: $breakpoint-lg)
+        font-size: 16px
+    
+    @media (max-width: $breakpoint-md)
+        font-size: 12px
+
+    @media (max-width: $breakpoint-sm)
+        font-size: 8px
+    
+    
 
 .glow-on-hover
     transition: text-shadow 0.3s ease
@@ -85,6 +126,8 @@ body
 
 .header
     display: flex
+    flex-direction: row
+    flex-wrap: wrap
     align-items: center
     justify-content: space-between
     padding: $space-md $space-lg
