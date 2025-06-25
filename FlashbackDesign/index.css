@@ -104,7 +104,7 @@ body {
 .hero .hero-image {
   width: 100%;
   height: 50vh;
-  background-image: linear-gradient(to top, #0f0d0f, rgba(0, 0, 0, 0) 25%), url("/media/hero-bg.jpg");
+  background-image: linear-gradient(to top, #0f0d0f, rgba(0, 0, 0, 0) 25%), url("/FlashbackDesign/media/hero-bg.jpg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
