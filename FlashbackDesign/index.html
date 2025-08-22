@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FlashBack Design</title>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="index.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <header class="header">
+        <h1 class="logo glow-pulse"><span class="flicker">FLASHBACK</span><br><span class="flicker">DESIGN</span></h1>
+        <nav class="main-nav">
+            <a class="glow-on-hover nav-link nav-projects" href="#projects">Projects</a>
+            <a class="glow-on-hover nav-link nav-about" href="#about">About</a>
+            <a class="glow-on-hover nav-link nav-contact" href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-image"></div>
+        <div class="hero-text">
+            <h2 class="hero-title light-glow">Hardware and Software<br>for broadcasts</h2>
+            <p class="hero-subtitle">Designing the future</p>
+        </div>
+    </section>
+
+    <main class="content">
+        <div class="sectionbreak"></div>
+        <section id="projects" class="projects">
+            <div class="section-title light-glow">
+                <span>PROJECTS</span>
+            </div>
+            <div class="project-grid">
+                <!-- Each project card -->
+                <article class="project-card">
+                    <div class="vhs-frame">
+                        <img src="project1.jpg" alt="Project 1 Screenshot" />
+                        <div class="vhs-label">Play ▶</div>
+                    </div>
+                    <h4>Project Name</h4>
+                    <p>Short description of the design.</p>
+                </article>
+
+                <!-- Add more project cards -->
+            </div>
+        </section>
+
+        <div class="sectionbreak"></div>
+
+        <section id="about" class="about">
+            <div class="section-title light-glow">
+                <span>ABOUT US</span>
+            </div>
+            <p>
+                For now the FlashBack team consists of only one person:<br><span class="outrun glow">OUTRUN1987</span>
+                <br><br>I'm a student who works as a broadcast director for different cybersport events.
+                <br> As part of my job, I'm trying to make hosting those events as easy as possible,
+                thus making some cool hardware stuff and software.
+            </p>
+        </section>
+
+        <div class="sectionbreak"></div>
+        <section id="contact" class="contact">
+            <div class="section-title light-glow">
+                <span>CONTACT</span>
+            </div>
+            <form>
+                <label>Name</label>
+                <input type="text" placeholder="Your name" />
+                <label>Email</label>
+                <input type="email" placeholder="you@example.com" />
+                <label>Message</label>
+                <textarea class="txta" placeholder="Let's build something cool..."></textarea>
+
+                <button type="submit">Send Message</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+
+    </footer>
+
+    <script>
+
+        $("textarea").each(function () {
+            this.style.height = this.scrollHeight + "px";
+            this.style.overflowY = "hidden";
+        }).on("input", function () {
+            this.style.height = "auto";
+            this.style.height = this.scrollHeight + "px";
+        });
+    </script>
+</body>
+
+</html>
