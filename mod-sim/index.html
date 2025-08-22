@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Симулятор Модера</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Симулятор Модератора</h1>
+    <h2>Добро пожаловать в симулятор модератора чата!</h2>
+    <h3>Прежде чем начать, покапайся немного в настройках</h3>
+
+    <p>Продолжительность игры</p>
+    <select id="duration">
+      <option value="short" selected>30 секунд</option>
+      <option value="medium">2 минуты</option>
+      <option value="long">5 минут</option>
+      <option value="extra">10 минут</option>
+    </select>
+
+    <p>Сложность игры</p>
+    <select id="difficulty">
+      <option value="easy">Легкотня</option>
+      <option value="medium" selected>Уже что-то</option>
+      <option value="hard">Хороший онлайн</option>
+      <option value="psycho">ТЫ ПСИХ!?</option>
+    </select>
+
+    <p>Тема</p>
+    <select id="theme">
+      <option value="terminal" selected>Лето 1984го</option>
+    </select>
+
+    <button onclick="start()">
+      Начать
+    </button>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
