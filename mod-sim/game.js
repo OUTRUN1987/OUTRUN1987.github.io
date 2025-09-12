@@ -78,6 +78,7 @@ document.addEventListener("keydown", (e) => {
     if (!played) {
       played = true;
       startGame();
+      console.log("Game started");
       return;
     }
     e.preventDefault();

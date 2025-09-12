@@ -52,6 +52,10 @@ theme.addEventListener("change", () => {
       theme.style.background = "#1e5f20ff"; // тёмно-зелёный
       theme.style.color = "#dfdfdf";      // светлый зелёный текст
       break;
+    case "modern":
+      theme.style.background = "#667eea"; // современный фиолетовый
+      theme.style.color = "#ffffff";      // белый текст
+      break;
   }
 });
 duration.value = localStorage.getItem("duration");
@@ -71,6 +75,9 @@ function start() {
     switch (localStorage.getItem("theme")) {
         case "terminal":
             window.location.href = "./terminal/terminal.html";
+            break;
+        case "modern":
+            window.location.href = "./modern/modern.html";
             break;
     }
 }
